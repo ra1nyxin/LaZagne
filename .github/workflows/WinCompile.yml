@@ -20,6 +20,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: 3.11
+        cache: 'pip'
 
     - name: Generate Random Version ID
       id: gen_id
@@ -29,30 +30,28 @@ jobs:
         $timestamp = Get-Date -Format "yyyyMMdd-HHmm"
         $final_id = "rel-$timestamp-$random_str"
         echo "RAND_ID=$final_id" >> $env:GITHUB_ENV
-        echo "::set-output name=RAND_ID::$final_id"
 
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install pyinstaller
         pip install -r requirements.txt
 
-    - name: Build Executable with PyInstaller
+    - name: Build Executable (Static One-File)
+      shell: pwsh
       run: |
         cd Windows
-        pyinstaller lazagne.spec
+        python -m PyInstaller lazagne.spec
 
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ env.RAND_ID }}
         name: Build-${{ env.RAND_ID }}
         draft: false
         prerelease: false
-        files: Windows/dist/lazagne.exe
+        files: Windows/dist/*.exe 
 
-    - name: Diagnostic Info
-      run: |
-        echo "Release successfully deployed with ID: ${{ env.RAND_ID }}"
+    - name: Finalizing
+      run: echo "Deployment of ${{ env.RAND_ID }} completed."
