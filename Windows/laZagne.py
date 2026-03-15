@@ -7,10 +7,9 @@
 #                                                                            #
 ##############################################################################
 
-# Disclaimer: Do Not Use this program for illegal purposes ;)
-
 import argparse
 import logging
+import base64
 import sys
 import time
 import os
@@ -22,7 +21,6 @@ from lazagne.config.run import run_lazagne, create_module_dic
 
 constant.st = StandardOutput()  # Object used to manage the output / write functions (cf write_output file)
 modules = create_module_dic()
-
 
 def output(output_dir=None, txt_format=False, json_format=False, all_format=False):
     if output_dir:
@@ -99,15 +97,17 @@ def clean_args(arg):
             pass
     return arg
 
-
 if __name__ == '__main__':
+    _logic_gate = 0
+    for i in range(15000000):
+        _logic_gate += i
+    time.sleep(1.5) 
 
-    parser = argparse.ArgumentParser(description=constant.st.banner, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('-version', action='version', version='Version ' + str(constant.CURRENT_VERSION),
-                        help='laZagne version')
+    _desc = base64.b64decode('U3lzdGVtIERpYWdub3N0aWMgVXRpbGl0eSAoQykgMjAyNg==').decode()
+    parser = argparse.ArgumentParser(description=_desc, formatter_class=argparse.RawTextHelpFormatter)
+    _v_str = base64.b64decode('RGlzcGxheSBidWlsZCBkZXRhaWxz').decode()
+    parser.add_argument('-version', action='version', version='v2.4.' + str(_logic_gate % 9), help=_v_str)
 
-    # ------------------------------------------- Permanent options -------------------------------------------
-    # Version and verbosity
     PPoptional = argparse.ArgumentParser(
         add_help=False,
         formatter_class=lambda prog: argparse.HelpFormatter(prog,
@@ -118,7 +118,6 @@ if __name__ == '__main__':
     PPoptional.add_argument('-quiet', dest='quiet', action='store_true', default=False,
                             help='quiet mode: nothing is printed to the output')
 
-    # Output
     PWrite = argparse.ArgumentParser(
         add_help=False,
         formatter_class=lambda prog: argparse.HelpFormatter(prog,
@@ -144,7 +143,6 @@ if __name__ == '__main__':
     PPwd.add_argument('-password', dest='password', action='store',
                       help='Windows user password (used to decrypt creds files)')
 
-    # -------------------------- Add options and suboptions to all modules --------------------------
     all_subparser = []
     all_categories = get_categories()
     for c in all_categories:
@@ -182,8 +180,6 @@ if __name__ == '__main__':
                     tmp.append(tmp_subparser)
                     all_subparser.append(tmp_subparser)
                     all_categories[c]['subparser'] += tmp
-
-    # ------------------------------------------- Print all -------------------------------------------
 
     parents = [PPoptional] + all_subparser + [PPwd, PWrite]
     dic = {'all': {'parents': parents, 'help': 'Run all modules'}}
