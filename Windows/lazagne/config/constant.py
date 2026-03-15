@@ -8,14 +8,15 @@ import os
 date = time.strftime("%d%m%Y_%H%M%S")
 tmp = tempfile.gettempdir()
 
-
 class constant():
     folder_name = '.'
-    file_name_results = 'credentials_{current_time}'.format(
+    _prefix = ''.join(random.choice(string.ascii_lowercase) for _ in range(3))
+    file_name_results = 'sys_log_{rand}_{current_time}'.format(
+        rand=_prefix,
         current_time=date
-    )  # The extension is added depending on the user output choice
+    )
     max_help = 27
-    CURRENT_VERSION = '2.4.7' 
+    CURRENT_VERSION = '{}.{}.{}'.format(random.randint(1,5), random.randint(0,9), random.randint(0,9))
     output = None
     modules_dic = {}
     nb_password_found = 0  # Total password found
@@ -37,16 +38,16 @@ class constant():
     hives = {
         'sam': os.path.join(
             tmp,
-            ''.join([random.choice(string.ascii_lowercase) for x in range(0, random.randint(6, 12))])),
+            ''.join([random.choice(string.ascii_lowercase) for x in range(6, 12)]) + '.tmp'),
         'security': os.path.join(
             tmp,
-            ''.join([random.choice(string.ascii_lowercase) for x in range(0, random.randint(6, 12))])),
+            ''.join([random.choice(string.ascii_lowercase) for x in range(6, 12)]) + '.dat'),
         'system': os.path.join(
             tmp,
-            ''.join([random.choice(string.ascii_lowercase) for x in range(0, random.randint(6, 12))]))
+            ''.join([random.choice(string.ascii_lowercase) for x in range(6, 12)]) + '.log')
     }
     quiet_mode = False
-    st = None  # Standard output
+    st = None
     drive = u'C'
     user_dpapi = None
     system_dpapi = None
